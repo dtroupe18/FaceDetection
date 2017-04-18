@@ -1,11 +1,13 @@
 # a single perceptron
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Perceptron(object):
-    def __init__(self, rate, epochs):
+    def __init__(self, rate, epochs, name):
         self.rate = rate
         self.epochs = epochs
+        self.name = name
 
     def fit(self, X, y):
         """
@@ -29,8 +31,8 @@ class Perceptron(object):
                 self.weight[0] += delta_w
                 err += int(delta_w != 0)
             self.errors.append(err)
-            print("Epoch: ", i)
-            print("Number of errors: ", err, "\n")
+            print("Epoch: ", i + 1, " Number of errors: ", err)
+        print("==============================================")
         return self
 
     def net_input(self, X):
@@ -42,4 +44,22 @@ class Perceptron(object):
 
         return np.where(self.net_input(X) >= 0.0, 1, 0)
 
+    def calculate_results(self, predicted, labels, number_of_samples):
+        correct = 0
+        incorrect = 0
 
+        for i in range(len(predicted)):
+            if predicted[i] == labels[i]:
+                correct += 1
+            else:
+                incorrect += 1
+
+        print(correct, " values were correctly predicted")
+        print(100 * (correct / number_of_samples), "% correct for ", str(self.name))
+
+    def graph_perceptron(self):
+        plt.plot(range(1, len(self.errors) + 1), self.errors, marker='o')
+        plt.xlabel("Epochs")
+        ylabel = "Number of misclassifications for ", str(self.name)
+        plt.ylabel(ylabel)
+        plt.show()
