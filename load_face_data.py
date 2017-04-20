@@ -83,6 +83,7 @@ again all images are stored as a text file such as
 import itertools
 import os
 import numpy as np
+import feature_extraction
 
 
 def read_lines(filename):
@@ -108,6 +109,39 @@ def create_images(data, height, width, n):
             current_integer_line = []
             for k in range(len(current_line)):
                 if current_line[k] == ' ':
+                    current_integer_line.append(0.0)
+                elif current_line[k] == '#':
+                    current_integer_line.append(1.0)
+
+            current_int_image.append(current_integer_line)
+        if len(current_int_image[-1]) < width:
+            break
+        """ No Feature Extraction """
+        # store the 0, 1's for the image in a one dimensional array
+        flat = list(itertools.chain(*current_int_image))
+        all_images.append(flat)
+
+    # convert to numpy ndarray
+    # np_array = np.array(all_images)
+
+    return all_images
+
+
+def create_2d_images(data, height, width, n):
+    """
+    Takes the data and returns a list of lists where each entry
+    is one image stored in a 2 dimensional array 60x70 the pixels are
+    marked as on or off. That is blank spaces get a 0 and pixels
+    with part of the image are 1.
+    """
+    all_images = []
+    for i in range(n):
+        current_int_image = []
+        for j in range(height):
+            current_line = data.pop()
+            current_integer_line = []
+            for k in range(len(current_line)):
+                if current_line[k] == ' ':
                     current_integer_line.append(0)
                 elif current_line[k] == '#':
                     current_integer_line.append(1)
@@ -115,15 +149,12 @@ def create_images(data, height, width, n):
             current_int_image.append(current_integer_line)
         if len(current_int_image[-1]) < width:
             break
-        """ Before Feature Extraction """
-        # store the 0, 1's for the image in a one dimensional array
-        flat = list(itertools.chain(*current_int_image))
-        all_images.append(flat)
 
-    # convert to numpy ndarray
-    #np_array = np.array(all_images)
+        all_images.append(current_int_image)
+        """ Feature Extraction """
+        symmetry_scores = feature_extraction.calculate_symmetry(all_images)
 
-    return all_images
+    return symmetry_scores
 
 
 def load_labels(filename):
@@ -143,13 +174,8 @@ def load_labels(filename):
 
     return np_array
 
-def extract_facial_features(image):
-    """
-    Basic idea is that a face is horizontally symmetrical
 
-    """
-
-def load_data():
+def load_data(two_d=False):
     """Return the number image data as a tuple containing the training data,
     the validation data, and the test data.
 
@@ -168,20 +194,68 @@ def load_data():
     each contains only 1,000 images.
     """
 
-    train_data = read_lines("facedata/facedatatrain")
-    train_images = create_images(train_data, 70, 60, 451)
-    train_labels = load_labels("facedata/facedatatrainlabels")
+    if two_d:
+        train_data = read_lines("facedata/facedatatrain")
+        train_images = create_2d_images(train_data, 70, 60, 451)
+        train_labels = load_labels("facedata/facedatatrainlabels")
 
-    val_data = read_lines("facedata/facedatavalidation")
-    val_images = create_images(val_data, 70, 60, 301)
-    val_labels = load_labels("facedata/facedatavalidationlabels")
+        val_data = read_lines("facedata/facedatavalidation")
+        val_images = create_2d_images(val_data, 70, 60, 301)
+        val_labels = load_labels("facedata/facedatavalidationlabels")
 
-    test_data = read_lines("facedata/facedatatest")
-    test_images = create_images(test_data, 70, 60, 150)
-    test_labels = load_labels("facedata/facedatatestlabels")
+        test_data = read_lines("facedata/facedatatest")
+        test_images = create_2d_images(test_data, 70, 60, 150)
+        test_labels = load_labels("facedata/facedatatestlabels")
 
-    training_data = (train_images, train_labels)
-    validation_data = (val_images, val_labels)
-    testing_data = (test_images, test_labels)
+        training_data = (train_images, train_labels)
+        validation_data = (val_images, val_labels)
+        testing_data = (test_images, test_labels)
 
-    return training_data, validation_data, testing_data
+        return training_data, validation_data, testing_data
+
+    else:
+        train_data = read_lines("facedata/facedatatrain")
+        train_images = create_images(train_data, 70, 60, 451)
+        train_labels = load_labels("facedata/facedatatrainlabels")
+
+        val_data = read_lines("facedata/facedatavalidation")
+        val_images = create_images(val_data, 70, 60, 301)
+        val_labels = load_labels("facedata/facedatavalidationlabels")
+
+        test_data = read_lines("facedata/facedatatest")
+        test_images = create_images(test_data, 70, 60, 150)
+        test_labels = load_labels("facedata/facedatatestlabels")
+
+        training_data = (train_images, train_labels)
+        validation_data = (val_images, val_labels)
+        testing_data = (test_images, test_labels)
+
+        return training_data, validation_data, testing_data
+
+
+def get_face_images(images, labels):
+    # face has a value of 1
+    index_of_faces = []
+    face_images = []
+
+    for i in range(len(labels)):
+        if labels[i] == 1:
+            index_of_faces.append(i)
+
+    for index in index_of_faces:
+        face_images.append(images[index])
+
+    # 217 / 451 faces in training data
+    return face_images
+
+
+def find_average_face(face_images, training_data):
+    # find the mean face and subtract it from every image in the dataset
+
+    # compute the average face
+    average_face = np.mean(face_images, 0)
+
+    # subtract average face from every image in the training set
+    centered_data = training_data - average_face
+
+    return centered_data

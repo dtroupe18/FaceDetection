@@ -1,6 +1,7 @@
 # a single perceptron
 import numpy as np
 import matplotlib.pyplot as plt
+from random import gauss
 
 
 class Perceptron(object):
@@ -17,8 +18,9 @@ class Perceptron(object):
         :return:
         """
 
-        # weights
-        self.weight = np.zeros(1 + X.shape[1])
+        # generate initial weights with 0 mean and variance 1
+        self.weight = [gauss(0, 1) for i in range(1 + X.shape[1])]
+        # self.weight = np.zeros(1 + X.shape[1])
 
         # Number of misclassifications
         self.errors = []
@@ -55,7 +57,8 @@ class Perceptron(object):
                 incorrect += 1
 
         print(correct, " values were correctly predicted")
-        print(100 * (correct / number_of_samples), "% correct for ", str(self.name))
+        print(100 * (correct / number_of_samples), "% correct for", str(self.name))
+        print("______________________________________________")
 
     def graph_perceptron(self):
         plt.plot(range(1, len(self.errors) + 1), self.errors, marker='o')
