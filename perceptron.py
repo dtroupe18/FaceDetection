@@ -63,6 +63,6 @@ class Perceptron(object):
     def graph_perceptron(self):
         plt.plot(range(1, len(self.errors) + 1), self.errors, marker='o')
         plt.xlabel("Epochs")
-        ylabel = "Number of misclassifications for ", str(self.name)
-        plt.ylabel(ylabel)
+        y_label = "Number of misclassifications for ", str(self.name)
+        plt.ylabel(y_label)
         plt.show()
