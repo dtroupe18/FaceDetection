@@ -158,7 +158,7 @@ def main(k, feature_extraction=False, cosine_d=False):
         print('Accuracy: ' + repr(accuracy) + '%')
 
 
-main(2, feature_extraction=True, cosine_d=True)
+main(3, feature_extraction=True, cosine_d=True)
 
 
 """
@@ -168,6 +168,7 @@ than 2 the accuracy was reduced.
 Statistics using 100% of the training data
 
 k = 2, Average-Face, Cosine = 100%
+k = 3, Average-Face, Cosine = 100%
 k = 2, Average-Face, Euclidean = 100%
 k = 2, No Features, Cosine = 50.667%
 k = 2, No Features, Euclidean = 51.333%
