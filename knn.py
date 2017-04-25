@@ -6,44 +6,6 @@ import math
 import operator
 from scipy.spatial.distance import cosine
 import load_face_data
-import feature_extraction
-from sklearn.preprocessing import StandardScaler
-import numpy as np
-
-
-def format_dataset(features=False):
-    # load face images
-    training_data, validation_data, test_data = load_face_data.load_data()
-    test_labels = test_data[1]
-    train_labels = training_data[1]
-
-    if features:
-        faces = feature_extraction.get_face_images(training_data[0], training_data[1])
-        new_train_images = feature_extraction.find_average_face(faces, training_data[0])
-        new_test_images = feature_extraction.find_average_face(test_data[0], test_data[1])
-        train_images = StandardScaler().fit_transform(new_train_images).tolist()
-        test_images = StandardScaler().fit_transform(new_test_images).tolist()
-
-    else:
-        train_images = StandardScaler().fit_transform(training_data[0]).tolist()
-        test_images = StandardScaler().fit_transform(test_data[0]).tolist()
-
-    # add label to image data so the last element is "Face" or "Not-Face"
-    for x in range(len(train_labels)):
-        if train_labels[x] == 1:
-            train_images[x].append("Face")
-        else:
-            train_images[x].append("Not-Face")
-
-    for x in range(len(test_labels)):
-        if test_labels[x] == 1:
-            test_images[x].append("Face")
-        else:
-            test_images[x].append("Not-Face")
-
-    # print(train_images[0])
-
-    return train_images, test_images
 
 
 def euclidean_distance(instance1, instance2, length):
@@ -127,12 +89,12 @@ def get_accuracy(test_set, predictions):
     return (correct / float(len(test_set))) * 100.0
 
 
-def main(k, feature_extraction=False, cosine_d=False):
+def main(k, feature_extract=False, cosine_d=False):
     # prepare data
-    if feature_extraction:
-        training_set, test_set = format_dataset(True)
+    if feature_extract:
+        training_set, test_set = load_face_data.format_dataset_knn(True)
     else:
-        training_set, test_set = format_dataset()
+        training_set, test_set = load_face_data.format_dataset_knn()
 
     print('Train set: ' + repr(len(training_set)))
     print('Test set: ' + repr(len(test_set)))
@@ -158,7 +120,7 @@ def main(k, feature_extraction=False, cosine_d=False):
         print('Accuracy: ' + repr(accuracy) + '%')
 
 
-main(3, feature_extraction=True, cosine_d=True)
+main(3, feature_extract=True, cosine_d=True)
 
 
 """

@@ -84,6 +84,7 @@ import itertools
 import os
 import numpy as np
 import feature_extraction
+from sklearn.preprocessing import StandardScaler
 
 
 def read_lines(filename):
@@ -109,9 +110,9 @@ def create_images(data, height, width, n):
             current_integer_line = []
             for k in range(len(current_line)):
                 if current_line[k] == ' ':
-                    current_integer_line.append(0.0)
+                    current_integer_line.append(0)
                 elif current_line[k] == '#':
-                    current_integer_line.append(1.0)
+                    current_integer_line.append(1)
 
             current_int_image.append(current_integer_line)
         if len(current_int_image[-1]) < width:
@@ -175,7 +176,7 @@ def load_labels(filename):
     return np_array
 
 
-def load_data(two_d=False):
+def load_data():
     """Return the number image data as a tuple containing the training data,
     the validation data, and the test data.
 
@@ -194,43 +195,23 @@ def load_data(two_d=False):
     each contains only 1,000 images.
     """
 
-    if two_d:
-        train_data = read_lines("facedata/facedatatrain")
-        train_images = create_2d_images(train_data, 70, 60, 451)
-        train_labels = load_labels("facedata/facedatatrainlabels")
+    train_data = read_lines("facedata/facedatatrain")
+    train_images = create_images(train_data, 70, 60, 451)
+    train_labels = load_labels("facedata/facedatatrainlabels")
 
-        val_data = read_lines("facedata/facedatavalidation")
-        val_images = create_2d_images(val_data, 70, 60, 301)
-        val_labels = load_labels("facedata/facedatavalidationlabels")
+    val_data = read_lines("facedata/facedatavalidation")
+    val_images = create_images(val_data, 70, 60, 301)
+    val_labels = load_labels("facedata/facedatavalidationlabels")
 
-        test_data = read_lines("facedata/facedatatest")
-        test_images = create_2d_images(test_data, 70, 60, 150)
-        test_labels = load_labels("facedata/facedatatestlabels")
+    test_data = read_lines("facedata/facedatatest")
+    test_images = create_images(test_data, 70, 60, 150)
+    test_labels = load_labels("facedata/facedatatestlabels")
 
-        training_data = (train_images, train_labels)
-        validation_data = (val_images, val_labels)
-        testing_data = (test_images, test_labels)
+    training_data = (train_images, train_labels)
+    validation_data = (val_images, val_labels)
+    testing_data = (test_images, test_labels)
 
-        return training_data, validation_data, testing_data
-
-    else:
-        train_data = read_lines("facedata/facedatatrain")
-        train_images = create_images(train_data, 70, 60, 451)
-        train_labels = load_labels("facedata/facedatatrainlabels")
-
-        val_data = read_lines("facedata/facedatavalidation")
-        val_images = create_images(val_data, 70, 60, 301)
-        val_labels = load_labels("facedata/facedatavalidationlabels")
-
-        test_data = read_lines("facedata/facedatatest")
-        test_images = create_images(test_data, 70, 60, 150)
-        test_labels = load_labels("facedata/facedatatestlabels")
-
-        training_data = (train_images, train_labels)
-        validation_data = (val_images, val_labels)
-        testing_data = (test_images, test_labels)
-
-        return training_data, validation_data, testing_data
+    return training_data, validation_data, testing_data
 
 
 def get_face_images(images, labels):
@@ -259,3 +240,72 @@ def find_average_face(face_images, training_data):
     centered_data = training_data - average_face
 
     return centered_data
+
+
+def format_dataset_knn(features=False):
+    # load face images
+    training_data, validation_data, test_data = load_data()
+    test_labels = test_data[1]
+    train_labels = training_data[1]
+
+    if features:
+        faces = feature_extraction.get_face_images(training_data[0], training_data[1])
+        new_train_images = feature_extraction.find_average_face(faces, training_data[0])
+        new_test_images = feature_extraction.find_average_face(test_data[0], test_data[1])
+        train_images = StandardScaler().fit_transform(new_train_images).tolist()
+        test_images = StandardScaler().fit_transform(new_test_images).tolist()
+
+    else:
+        train_images = StandardScaler().fit_transform(training_data[0]).tolist()
+        test_images = StandardScaler().fit_transform(test_data[0]).tolist()
+
+    # add label to image data so the last element is "Face" or "Not-Face"
+    for x in range(len(train_labels)):
+        if train_labels[x] == 1:
+            train_images[x].append('Face')
+        else:
+            train_images[x].append('Not-Face')
+
+    for x in range(len(test_labels)):
+        if test_labels[x] == 1:
+            test_images[x].append('Face')
+        else:
+            test_images[x].append('Not-Face')
+            # print(train_images[0])
+
+    return train_images, test_images
+
+
+def format_dataset_naive_bayes(features=False):
+    # load face images
+    training_data, validation_data, test_data = load_data()
+    test_labels = test_data[1]
+    train_labels = training_data[1]
+
+    if features:
+        print("Data Loading...")
+        faces = feature_extraction.get_face_images(training_data[0], training_data[1])
+        new_train_images = feature_extraction.find_average_face(faces, training_data[0]).tolist()
+        new_test_images = feature_extraction.find_average_face(test_data[0], test_data[1]).tolist()
+        train_images = StandardScaler().fit_transform(new_train_images).tolist()
+        test_images = StandardScaler().fit_transform(new_test_images).tolist()
+
+    else:
+        train_images = StandardScaler().fit_transform(training_data[0]).tolist()
+        test_images = StandardScaler().fit_transform(test_data[0]).tolist()
+
+    # add label to image data so the last element is "Face" or "Not-Face"
+    for x in range(len(train_labels)):
+        if train_labels[x] == 1:
+            train_images[x].append(1)
+        else:
+            train_images[x].append(0)
+
+    for x in range(len(test_labels)):
+        if test_labels[x] == 1:
+            test_images[x].append(1)
+        else:
+            test_images[x].append(0)
+            # print(train_images[0])
+
+    return train_images, test_images
