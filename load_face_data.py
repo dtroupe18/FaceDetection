@@ -1,5 +1,5 @@
 """
-Each face is 60x70 and from the Berkley classification project
+Each face is 60x70 and from the Berkeley classification project
 which took the photos from the Cal-tech 101 data set
 
 There are 451 training images
