@@ -182,8 +182,8 @@ def load_data():
 
     The ``training_data`` is returned as a tuple with two entries.
     The first entry contains the actual training images.  This is a
-    array with 451 entries.  Each entry is, in turn, an array with
-    4,200 values, representing the 60 * 70 = 4,200 pixels in a
+    array with 5,000 entries.  Each entry is, in turn, an array with
+     values, representing the 60 * 70 = 4,200 pixels in a
     single image. On pixels are a 1 and off pixels are a 0.
 
     The second entry in the ``training_data`` tuple is an array

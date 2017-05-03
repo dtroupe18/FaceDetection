@@ -79,7 +79,7 @@ def get_accuracy(test_set, predictions):
     """
 
     :param test_set: testing dataset
-    :param predictions: labels based on kNN
+    :param predictions: labels based on KNN
     :return: percent correct
     """
     correct = 0

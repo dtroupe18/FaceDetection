@@ -172,6 +172,9 @@ def run_average_face_perceptron(rate, epochs, standardize=False):
         average_face_perceptron.calculate_results(average_results, test_labels, 150)
         average_face_perceptron.graph_perceptron()
 
+    # for b in range(25):
+    #     print(average_results[b], ": ", test_labels[b])
+
 
 """
 Average faces gets 100% accuracy in both cases. I am using both the training and validation images
@@ -183,6 +186,6 @@ epochs versus eighteen.
 # run_regular_perceptron(0.01, 20)
 # run_train_validation_perceptron(0.01, 25)
 # run_sym_face_perceptron()
-run_average_face_perceptron(0.01, 20)
+# run_average_face_perceptron(0.01, 20)
 run_average_face_perceptron(0.01, 12, standardize=True)
 
