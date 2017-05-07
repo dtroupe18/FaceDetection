@@ -7,7 +7,6 @@ import math
 import load_face_data
 import numpy as np
 
-
 def separate_by_label(dataset):
     """
 
