@@ -79,7 +79,6 @@ def calc_probability(x, mean, standard_deviation):
         # ( 1 / sqrt(2π) ^ exponent
         return (1 / (math.sqrt(2 * math.pi) * s_d)) * exponent
 
-
     else:
         exponent = math.exp(-(math.pow(x - mean, 2) / (2 * math.pow(standard_deviation, 2))))
         # ( 1 / sqrt(2π) ^ exponent
@@ -177,5 +176,7 @@ main()
 """
 This gets poor results around 51.33% accuracy because many features have
 a standard deviation of zero and I am not sure how to adjust the model
-in order to get better results.
+in order to get better results. This should be changed from using a
+normal distribution to using conditional probability. This eliminates
+the need to calculate the standard deviation.
 """
